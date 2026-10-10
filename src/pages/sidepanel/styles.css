@@ -1,0 +1,429 @@
+/* ---------------------------------------------------------------------------
+   Design system: "the keeper's logbook", quieter edition
+   Same ink / brass / verdigris identity, but separation now comes from tone
+   and white space instead of outlines. Serif (Newsreader) carries titles and
+   numbers; sans (IBM Plex Sans) carries everything you read or tap.
+   Dark is the native mode; light is the same system by daylight.
+   All class names are unchanged, so this is a drop-in replacement.
+--------------------------------------------------------------------------- */
+:root {
+  --bg: #efefe9;
+  --surface: #f9f9f5;
+  --surface-2: #e4e5dc;
+  --ink: #1b2420;
+  --muted: #667069;
+  --line: #dcddd2;
+  --line-strong: #c3c5b6;
+
+  --accent: #8c6425;
+  --accent-strong: #6b4a19;
+  --accent-soft: #eee1c9;
+  --accent-contrast: #fbf6ec;
+
+  --good: #3f7a62;
+  --good-soft: #dfebe4;
+  --warn: #93661c;
+  --warn-soft: #f1e3c4;
+  --bad: #9c4433;
+  --bad-soft: #f3ded8;
+
+  --cat-social: #7d5c78;
+  --cat-entertainment: #9c5b3c;
+  --cat-productivity: #3f7a62;
+  --cat-other: #6b7680;
+  --cat-fallback-0: #4c6e8c;
+  --cat-fallback-1: #7a5a8c;
+  --cat-fallback-2: #8c7a3c;
+  --cat-fallback-3: #4f7a6e;
+
+  --sans: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: 'Newsreader', Georgia, "Iowan Old Style", "Times New Roman", serif;
+
+  --radius-xl: 22px;
+  --radius-l: 16px;
+  --radius-m: 12px;
+  --radius-s: 8px;
+  --ease: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: light dark;
+}
+
+/* @media (prefers-color-scheme: dark) { */
+/*   :root { */
+/*     --bg: #0e1418; */
+/*     --surface: #161f26; */
+/*     --surface-2: #1f2b33; */
+/*     --ink: #eceee7; */
+/*     --muted: #8f9ca2; */
+/*     --line: #243038; */
+/*     --line-strong: #34444d; */
+/**/
+/*     --accent: #c89752; */
+/*     --accent-strong: #e3b876; */
+/*     --accent-soft: #2e2615; */
+/*     --accent-contrast: #1b140a; */
+/**/
+/*     --good: #6fae94; */
+/*     --good-soft: #15291f; */
+/*     --warn: #d7a24a; */
+/*     --warn-soft: #2e2311; */
+/*     --bad: #d97a66; */
+/*     --bad-soft: #341d16; */
+/**/
+/*     --cat-social: #b08caa; */
+/*     --cat-entertainment: #c98257; */
+/*     --cat-productivity: #6fae94; */
+/*     --cat-other: #93a0a6; */
+/*     --cat-fallback-0: #7fa0be; */
+/*     --cat-fallback-1: #b499c2; */
+/*     --cat-fallback-2: #bdae6e; */
+/*     --cat-fallback-3: #86a89b; */
+/*   } */
+/* } */
+
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.55 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+button, input, select { font: inherit; color: inherit; }
+::selection { background: var(--accent); color: var(--accent-contrast); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 99px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* ---------------------------------------------------------------------------
+   App shell
+--------------------------------------------------------------------------- */
+.app { display: flex; flex-direction: column; height: 100%; min-width: 280px; }
+
+.app-head { padding: 24px 20px 0; }
+.brand {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 20px;
+}
+
+/* Quiet text tabs: the active one is darker with a short brass underline. */
+.tabs { display: flex; gap: 20px; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  position: relative;
+  flex: none;
+  background: transparent;
+  border: 0;
+  padding: 6px 0 10px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+.tab:hover { color: var(--ink); }
+.tab::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.28s var(--ease);
+}
+.tab[aria-selected="true"] { color: var(--ink); font-weight: 600; }
+.tab[aria-selected="true"]::after { transform: scaleX(1); }
+
+.app-main { flex: 1; overflow-y: auto; padding: 28px 20px 40px; }
+.stack { display: flex; flex-direction: column; gap: 40px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .app-main > .stack, .app-main > p { animation: rise-in 0.5s var(--ease-out) both; }
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.skeleton-stack { display: flex; flex-direction: column; gap: 16px; padding-top: 4px; }
+.skeleton-bar { height: 14px; border-radius: 7px; background: linear-gradient(100deg, var(--surface-2) 30%, var(--surface) 50%, var(--surface-2) 70%); background-size: 200% 100%; }
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton-bar { animation: shimmer 1.4s ease-in-out infinite; }
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ---------------------------------------------------------------------------
+   Section / typography helpers
+--------------------------------------------------------------------------- */
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 16px; }
+.section-head h2 { font-family: var(--serif); font-size: 19px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.2; margin: 0; }
+.muted { color: var(--muted); }
+.small { font-size: 12.5px; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------------------
+   Live status chip
+--------------------------------------------------------------------------- */
+.live {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--radius-l);
+  background: var(--surface);
+}
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); flex: none; opacity: 0.6; }
+.dot.on { opacity: 1; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+@media (prefers-reduced-motion: no-preference) {
+  .dot.on { animation: breathe 2.6s ease-in-out infinite; }
+}
+@keyframes breathe { 50% { opacity: 0.55; box-shadow: 0 0 0 6px var(--accent-soft); } }
+.live-text { flex: 1; min-width: 0; }
+.live-text strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.clock { font-family: var(--serif); font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums oldstyle-nums; }
+
+/* ---------------------------------------------------------------------------
+   Focus dial (dashboard hero)
+--------------------------------------------------------------------------- */
+.hero { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 8px 0 0; }
+.ring-wrap { position: relative; width: 176px; height: 176px; }
+.ring-svg { display: block; overflow: visible; }
+.ring-bezel { stroke: var(--line); }
+.ring-track { stroke: var(--surface-2); }
+.ring-tick { stroke: var(--line-strong); }
+.ring-tick.major { stroke: var(--muted); }
+.ring-arc { transition: stroke-dasharray 0.6s var(--ease), transform 0.6s var(--ease); }
+.ring-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; text-align: center;
+}
+.ring-value { font-family: var(--serif); font-size: 34px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.05; font-variant-numeric: oldstyle-nums; }
+.ring-label { max-width: 100px; line-height: 1.3; }
+
+.legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+
+/* ---------------------------------------------------------------------------
+   Facts grid
+--------------------------------------------------------------------------- */
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 28px 20px; margin: 0; }
+.facts dt { color: var(--muted); font-size: 12.5px; }
+.facts dd { margin: 4px 0 0; font-size: 26px; line-height: 1.15; letter-spacing: -0.01em; font-weight: 500; font-variant-numeric: tabular-nums oldstyle-nums; font-family: var(--serif); }
+
+/* ---------------------------------------------------------------------------
+   Panels: a soft tonal plate, no outline
+--------------------------------------------------------------------------- */
+.panel {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: 22px 22px 24px;
+}
+.rows { display: flex; flex-direction: column; gap: 22px; }
+.row-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.row-head span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------------------------------------------------------------------------
+   Progress bar
+--------------------------------------------------------------------------- */
+.bar { position: relative; height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width 0.5s var(--ease); }
+.bar-fill.warn { background: var(--warn); }
+.bar-fill.bad { background: var(--bad); }
+.bar-fill.good { background: var(--good); }
+.bar-tick { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--ink); opacity: 0.25; }
+
+/* ---------------------------------------------------------------------------
+   Ribbon (range aggregates in Statistics)
+--------------------------------------------------------------------------- */
+.ribbon { display: flex; height: 10px; border-radius: 99px; overflow: hidden; background: var(--surface-2); gap: 3px; }
+.ribbon > span { display: block; min-width: 4px; transition: flex-grow 0.5s var(--ease); }
+
+/* ---------------------------------------------------------------------------
+   Insights / alerts: a tinted card with a small status dot, no side stripe
+--------------------------------------------------------------------------- */
+.insights { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.insights li {
+  position: relative;
+  padding: 14px 16px 14px 38px;
+  border-radius: var(--radius-m);
+  background: var(--surface);
+}
+.insights li::before {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 21px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.insights li.warn { background: var(--warn-soft); }
+.insights li.warn::before { background: var(--warn); }
+.insights li.good { background: var(--good-soft); }
+.insights li.good::before { background: var(--good); }
+.insights li.info { background: var(--accent-soft); }
+.insights li.info::before { background: var(--accent); }
+
+/* ---------------------------------------------------------------------------
+   Log list: timestamped record, separated by space rather than rules
+--------------------------------------------------------------------------- */
+.log-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.log-row { display: flex; align-items: baseline; gap: 12px; padding: 8px 0; }
+.log-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; position: relative; top: -1px; background: var(--muted); }
+.log-dot.bad { background: var(--bad); }
+.log-dot.warn { background: var(--warn); }
+.log-text { flex: 1; min-width: 0; }
+.log-time { flex: none; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------------------
+   Empty state
+--------------------------------------------------------------------------- */
+.empty { display: flex; gap: 14px; align-items: flex-start; padding: 24px 2px; color: var(--muted); }
+.empty-icon { flex: none; color: var(--muted); opacity: 0.8; margin-top: 2px; }
+.empty strong { display: block; color: var(--ink); font-family: var(--serif); font-size: 17px; font-weight: 500; margin-bottom: 3px; }
+
+/* ---------------------------------------------------------------------------
+   Buttons: tonal pills, the primary one is brass
+--------------------------------------------------------------------------- */
+.btn {
+  border: 0;
+  background: var(--surface-2);
+  border-radius: 999px;
+  padding: 9px 18px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: filter 0.15s ease, transform 0.12s ease, background 0.2s ease;
+}
+.btn:hover { filter: brightness(0.96); }
+.btn:active { transform: scale(0.98); }
+.btn.primary { background: var(--accent); color: var(--accent-contrast); font-weight: 600; }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.primary:active { filter: brightness(0.96); }
+.btn.danger { color: var(--bad); background: var(--bad-soft); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; filter: none; }
+
+.link-btn { background: none; border: 0; padding: 4px 6px; color: var(--muted); cursor: pointer; font-size: 12.5px; border-radius: 6px; transition: color 0.15s ease; }
+.link-btn:hover { color: var(--ink); }
+.link-btn.danger:hover { color: var(--bad); }
+
+/* ---------------------------------------------------------------------------
+   Inputs & fields: filled, borderless, brass ring on focus
+--------------------------------------------------------------------------- */
+.input, .select {
+  width: 100%; padding: 11px 14px;
+  border: 0; border-radius: var(--radius-m);
+  background: var(--surface-2); min-width: 0;
+  transition: box-shadow 0.15s ease;
+}
+.input::placeholder { color: var(--muted); }
+.input:focus-visible, .select:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--accent); }
+.input[aria-invalid="true"] { box-shadow: 0 0 0 2px var(--bad); }
+.field-row { display: flex; gap: 10px; align-items: center; }
+.field-row .btn { flex: none; }
+
+.seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--surface-2); border-radius: 999px; }
+.seg button { border: 0; background: none; padding: 5px 13px; border-radius: 999px; cursor: pointer; color: var(--muted); font-size: 12.5px; transition: background 0.2s ease, color 0.2s ease; }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); font-weight: 600; }
+
+/* ---------------------------------------------------------------------------
+   Todos (legacy list styles; the redesigned TodoList uses its own .td-* set)
+--------------------------------------------------------------------------- */
+.todo-list { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.todo { display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; }
+
+.todo input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  width: 20px; height: 20px; margin-top: 1px; flex: none;
+  border: 0; border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--line-strong);
+  background: transparent; position: relative; cursor: pointer;
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+.todo input[type="checkbox"]:hover { box-shadow: inset 0 0 0 2px var(--accent); }
+.todo input[type="checkbox"]::after {
+  content: ""; position: absolute; left: 7px; top: 3px; width: 5px; height: 9px;
+  border: solid var(--accent-contrast); border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0); transition: transform 0.2s var(--ease);
+}
+.todo input[type="checkbox"]:checked { background: var(--good); box-shadow: none; }
+.todo input[type="checkbox"]:checked::after { transform: rotate(45deg) scale(1); }
+
+.todo-body { flex: 1; min-width: 0; }
+.todo-title { overflow-wrap: anywhere; font-size: 15px; }
+.todo.done .todo-title { text-decoration: line-through; color: var(--muted); }
+.todo-actions { display: flex; gap: 2px; flex: none; }
+.tag-late { color: var(--bad); }
+
+/* ---------------------------------------------------------------------------
+   Settings
+--------------------------------------------------------------------------- */
+.form-group { display: flex; flex-direction: column; gap: 18px; }
+.form-group h3 { font-family: var(--serif); font-size: 17px; font-weight: 500; margin: 0; }
+
+.check { display: flex; gap: 14px; align-items: flex-start; cursor: pointer; }
+.check input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  width: 38px; height: 22px; flex: none; margin-top: 0;
+  border-radius: 999px; background: var(--line-strong); position: relative; cursor: pointer;
+  transition: background 0.22s ease;
+}
+.check input[type="checkbox"]::after {
+  content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px;
+  border-radius: 50%; background: var(--surface);
+  transition: transform 0.22s var(--ease);
+}
+.check input[type="checkbox"]:checked { background: var(--accent); }
+.check input[type="checkbox"]:checked::after { transform: translateX(16px); background: var(--accent-contrast); }
+
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field label, .field .label { font-weight: 600; font-size: 13px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 6px 5px 13px; border-radius: 999px;
+  background: var(--accent-soft); font-size: 12.5px;
+}
+.chip button { border: 0; background: none; cursor: pointer; padding: 0 6px; color: var(--muted); font-size: 15px; line-height: 1; }
+.chip button:hover { color: var(--bad); }
+.error { color: var(--bad); font-size: 12.5px; }
+
+/* Sticky save bar: fades content out beneath it instead of drawing a rule. */
+.save-bar {
+  position: sticky; bottom: -40px; margin: 0 -20px -40px; padding: 28px 20px 16px;
+  background: linear-gradient(to bottom, transparent, var(--bg) 40%);
+  display: flex; gap: 10px; align-items: center; justify-content: flex-end;
+}
+.save-bar .grow { flex: 1; min-width: 0; }
+
+/* ---------------------------------------------------------------------------
+   Charts
+--------------------------------------------------------------------------- */
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { fill: var(--muted); font-size: 9px; font-family: var(--sans); }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .chart rect, .chart path, .chart circle:not(.ring-track):not(.ring-bezel):not(.ring-tick) { animation: chart-in 0.5s var(--ease-out) both; }
+}
+@keyframes chart-in { from { opacity: 0; } to { opacity: 1; } }

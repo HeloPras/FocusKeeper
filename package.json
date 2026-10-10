@@ -1,0 +1,25 @@
+{
+  "name": "focuskeeper",
+  "version": "1.0.0",
+  "description": "Track distracting browsing time, plan daily tasks and get feedback from the Chrome side panel.",
+  "private": true,
+  "scripts": {
+    "dev": "extension dev",
+    "start": "extension start",
+    "build": "extension build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@fontsource/newsreader": "^5.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "extension": "^4.1.0",
+    "typescript": "~5.9.3"
+  }
+}

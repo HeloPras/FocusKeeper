@@ -1,0 +1,6 @@
+node_modules
+dist
+.DS_Store
+
+# Extension.js local session state
+.extension-js
