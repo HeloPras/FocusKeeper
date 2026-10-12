@@ -126,8 +126,8 @@
   cursor: pointer;
   padding: 10px 20px;
   border-radius: 999px;
-  background: var(--td-ink);
-  color: var(--td-bg);
+  background: var(--td-ink-2);
+  color: var(--td-ink-3);
   font-size: 0.95rem;
   font-weight: 600;
   transition: opacity 0.15s, transform 0.12s;
